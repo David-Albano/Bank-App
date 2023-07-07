@@ -175,6 +175,7 @@ btnLogin.addEventListener('click', function(e) {
     
     if(inputLoginUsername.value.toLowerCase().trim() === username.toLowerCase() && Number(inputLoginPin.value.trim()) === account.pin) {
       currentAccountLoggedIn = account
+      containerApp.style.transition = '.7s'
       containerApp.style.opacity = 100
       inputLoginUsername.value = inputLoginPin.value = ''
       btnLogout.classList.remove('hidden')
@@ -226,12 +227,13 @@ function startTimer(){
 function logout() {
   loggedIn = false
   containerApp.style.opacity = 0
+  containerApp.style.transition = '0s'
   currentAccountLoggedIn = null
   sortMovements = false
   transferAccountTo = null;
   minutedTimer = 10
   secondsTimer = 0
-
+  
   btnLogout.classList.add('hidden')
   loginForm.classList.remove('hidden')
   labelWelcome.innerHTML = 'Log in to get started'
