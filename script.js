@@ -44,6 +44,8 @@ const containerApp = document.querySelector('.app');
 const containerMovements = document.querySelector('.movements');
 
 const btnLogin = document.querySelector('.login__btn');
+const btnLogout = document.querySelector('.logout__btn');
+const loginForm = document.querySelector('.form-div');
 const btnTransfer = document.querySelector('.form__btn--transfer');
 const btnLoan = document.querySelector('.form__btn--loan');
 const btnClose = document.querySelector('.form__btn--close');
@@ -58,9 +60,12 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-let currentAccountLoggedIn;
+let currentAccountLoggedIn = null;
+let transferAccountTo = null;
 let sortMovements = false
-let transferAccountTo;
+let minutedTimer = 10
+let secondsTimer = 0
+let loggedIn = false
 
 const displayMovements = function(account, sort = false) {
     containerMovements.innerHTML = ''
@@ -125,7 +130,7 @@ btnTransfer.addEventListener('click', function(e) {
   })
 })
 
-// ~~~~~ Transfer Money ~~~~~~
+// ~~~~~ Loan Money ~~~~~~
 
 btnLoan.addEventListener('click', function(e) {
   e.preventDefault()
@@ -147,6 +152,19 @@ btnSort.addEventListener('click', function(e) {
 
   displayMovements(currentAccountLoggedIn, sortMovements)
 })
+
+// ~~~~~~ Close Account ~~~~~~
+
+btnClose.addEventListener('click', function(e) {
+  e.preventDefault()
+  username = checkUsername(currentAccountLoggedIn)
+  
+  if(inputCloseUsername.value.toLowerCase().trim() === username.toLowerCase()
+  && Number(inputClosePin.value.trim()) === currentAccountLoggedIn.pin) {
+    inputCloseUsername.value = inputClosePin.value = ''
+    return logout()
+  }
+})
   
 // ~~~~~ Login logic ~~~~~~
 
@@ -159,7 +177,12 @@ btnLogin.addEventListener('click', function(e) {
       currentAccountLoggedIn = account
       containerApp.style.opacity = 100
       inputLoginUsername.value = inputLoginPin.value = ''
+      btnLogout.classList.remove('hidden')
+      loginForm.classList.add('hidden')
+      loggedIn = true
+      labelWelcome.innerHTML = `Good Day, ${currentAccountLoggedIn.owner}! 👋`
       displayMovements(account)
+      startTimer()
     }
   })
 })
@@ -169,3 +192,49 @@ function checkUsername(account) {
   username = user[0][0] + user[1][0]
   return username
 }
+
+let startCountDown = setInterval(function() {
+      if(!loggedIn) {
+        clearInterval(startTimer)
+        labelTimer.innerHTML = '10:00'
+      }
+
+      if(minutedTimer === 0 && secondsTimer === 0){
+        return logout()
+      }
+
+      if (secondsTimer === 0) {
+        minutedTimer--
+        secondsTimer = 59
+      } else {
+        secondsTimer--
+      }
+
+      minutes = minutedTimer < 10 ? `0${minutedTimer}` : '' + minutedTimer
+      seconds = secondsTimer < 10 ? `0${secondsTimer}` : '' + secondsTimer
+      
+      labelTimer.innerHTML = `${minutes}:${seconds}`
+
+  }, 1000)
+
+function startTimer(){
+  minutedTimer = 10
+  secondsTimer = 0
+  startCountDown()
+}
+
+function logout() {
+  loggedIn = false
+  containerApp.style.opacity = 0
+  currentAccountLoggedIn = null
+  sortMovements = false
+  transferAccountTo = null;
+  minutedTimer = 10
+  secondsTimer = 0
+
+  btnLogout.classList.add('hidden')
+  loginForm.classList.remove('hidden')
+  labelWelcome.innerHTML = 'Log in to get started'
+}
+
+btnLogout.addEventListener('click', logout)

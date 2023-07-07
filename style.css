@@ -33,11 +33,15 @@ nav {
   height: 5.25rem;
 }
 
+.hidden {
+  display: none;
+}
+
 .login {
   display: flex;
 }
 
-.login__input {
+.login__input, .logout__btn {
   border: none;
   padding: 0.5rem 2rem;
   font-size: 1.6rem;
@@ -77,6 +81,15 @@ nav {
   color: #777;
 }
 
+.logout__btn {
+  color: #777;
+  cursor: pointer;
+}
+
+.logout__btn:hover {
+  background-color: #d6d3d3;
+}
+
 /* MAIN */
 .app {
   position: relative;
@@ -88,7 +101,7 @@ nav {
   gap: 2rem;
 
   /* NOTE This creates the fade in/out anumation */
-  /* opacity: 0; */
+  opacity: 0;
   transition: all 1s;
 }
 
