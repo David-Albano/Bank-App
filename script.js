@@ -1,9 +1,5 @@
 // 'use strict';
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// BANKIST APP
-
 // Data
 const account1 = {
   owner: 'David Afonso',
@@ -62,8 +58,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-let currentAccount = false
+let currentAccountLoggedIn;
 let sortMovements = false
+let transferAccountTo;
 
 const displayMovements = function(account, sort = false) {
     containerMovements.innerHTML = ''
@@ -79,7 +76,7 @@ const displayMovements = function(account, sort = false) {
     .filter((int, i, array) => {
       return int >= 1;
     })
-    .reduce((acc, int) => acc + int, 0);
+    .reduce((account, int) => account + int, 0);
 
     movements.forEach(function(value, index, movements) {
       balance += value
@@ -109,6 +106,37 @@ const displayMovements = function(account, sort = false) {
     labelSumInterest.innerHTML = valueInterest + ' €'
 }
 
+// ~~~~~ Transfer Money ~~~~~~
+
+btnTransfer.addEventListener('click', function(e) {
+  e.preventDefault()
+
+  accounts.forEach(function(account) {
+    username = checkUsername(account)
+    
+    if(inputTransferTo.value.toLowerCase().trim() === username.toLowerCase()) {
+      transferAccountTo = account
+      transferAccountTo.movements.push(Number(inputTransferAmount.value))
+      currentAccountLoggedIn.movements.push(0 - inputTransferAmount.value)   
+      inputTransferTo.value = inputTransferAmount.value = ''
+
+      displayMovements(currentAccountLoggedIn, sortMovements)
+    }
+  })
+})
+
+// ~~~~~ Transfer Money ~~~~~~
+
+btnLoan.addEventListener('click', function(e) {
+  e.preventDefault()
+  currentAccountLoggedIn.movements.push(Number(inputLoanAmount.value))   
+  inputLoanAmount.value  = ''
+
+  displayMovements(currentAccountLoggedIn, sortMovements)
+})
+
+// ~~~~~~ Sort Movements ~~~~~~
+
 btnSort.addEventListener('click', function(e) {
   e.preventDefault()
   sortMovements = !sortMovements
@@ -117,7 +145,7 @@ btnSort.addEventListener('click', function(e) {
   ? arrowIcon.classList.remove('rotate')
   : arrowIcon.classList.add('rotate')
 
-  displayMovements(currentAccount, sortMovements)
+  displayMovements(currentAccountLoggedIn, sortMovements)
 })
   
 // ~~~~~ Login logic ~~~~~~
@@ -125,13 +153,19 @@ btnSort.addEventListener('click', function(e) {
 btnLogin.addEventListener('click', function(e) {
   e.preventDefault()
   accounts.forEach(function(account) {
-    let user = account.owner.split(' ')
-    username = user[0][0] + user[1][0]
+    username = checkUsername(account)
     
     if(inputLoginUsername.value.toLowerCase().trim() === username.toLowerCase() && Number(inputLoginPin.value.trim()) === account.pin) {
-      currentAccount = account
+      currentAccountLoggedIn = account
       containerApp.style.opacity = 100
+      inputLoginUsername.value = inputLoginPin.value = ''
       displayMovements(account)
     }
   })
 })
+
+function checkUsername(account) {
+  let user = account.owner.split(' ')
+  username = user[0][0] + user[1][0]
+  return username
+}
