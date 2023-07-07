@@ -198,6 +198,12 @@ nav {
   font-size: 1.3rem;
   font-weight: 500;
   cursor: pointer;
+  display: flex;
+  gap: 5px;
+}
+
+.rotate {
+  transform: rotate(180deg);
 }
 
 /* OPERATIONS */
